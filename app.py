@@ -244,12 +244,10 @@ if not st.session_state['is_auth']:
             
         st.markdown("<h2 style='text-align: center;'>Portal Autentikasi Pengguna</h2>", unsafe_allow_html=True)
         
-        # PERBAIKAN POIN 2: Menggunakan st.radio agar form ter-reset otomatis setiap pindah pilihan
         mode_auth = st.radio("Pilih Mode:", ["🔑 Masuk (Login)", "📝 Daftar Akun Baru"], horizontal=True)
         
         if mode_auth == "🔑 Masuk (Login)":
             st.subheader("Sudah punya akun? Silakan masuk.")
-            # Tambahan clear_on_submit untuk mereset isi setelah tombol ditekan
             with st.form("form_login", clear_on_submit=True):
                 l_email = st.text_input("Email")
                 l_pass = st.text_input("Password", type="password")
@@ -283,12 +281,14 @@ if not st.session_state['is_auth']:
                 if submit_reg:
                     pola_email = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.(com|co\.id|ac\.id|go\.id|net|org|id)$'
                     
-                    if not r_nama.strip():
-                        st.error("❌ Nama Lengkap wajib diisi!")
-                    elif not r_email.strip():
-                        st.error("❌ Email wajib diisi!")
-                    elif not r_pass.strip():
-                        st.error("❌ Password wajib diisi!")
+                    # REVISI 2: Mengumpulkan semua input yang kosong dalam sebuah list
+                    form_kosong = []
+                    if not r_nama.strip(): form_kosong.append("Nama Lengkap")
+                    if not r_email.strip(): form_kosong.append("Email")
+                    if not r_pass.strip(): form_kosong.append("Password")
+                    
+                    if form_kosong:
+                        st.error(f"❌ Form Tidak Lengkap! Anda wajib mengisi kolom berikut: **{', '.join(form_kosong)}**")
                     elif len(r_pass) < 8:
                         st.warning("❌ Password harus minimal 8 karakter.")
                     elif not re.match(pola_email, r_email):
@@ -347,18 +347,19 @@ if st.session_state['is_auth']:
             st.divider()
             st.info("Ketikkan angka persis seperti yang tertera di lembar uji laboratorium Anda.")
             
+            # REVISI 1: Menambahkan batas maksimum (max_value) kewajaran input data medis
             col1, col2 = st.columns(2)
             with col1:
-                bmi = st.number_input("BMI (kg/m²)", min_value=0.0, value=0.0, format="%.1f")
-                hba1c = st.number_input("Kadar HbA1c (%)", min_value=0.0, value=0.0, format="%.1f")
-                urea = st.number_input("Urea", min_value=0.0, value=0.0, format="%.1f")
-                cr = st.number_input("Cr (Kreatinin)", min_value=0.0, value=0.0, format="%.1f")
+                bmi = st.number_input("BMI (kg/m²)", min_value=0.0, max_value=50.0, value=0.0, format="%.1f")
+                hba1c = st.number_input("Kadar HbA1c (%)", min_value=0.0, max_value=30.0, value=0.0, format="%.1f")
+                urea = st.number_input("Urea", min_value=0.0, max_value=100.0, value=0.0, format="%.1f")
+                cr = st.number_input("Cr (Kreatinin)", min_value=0.0, max_value=500.0, value=0.0, format="%.1f")
             with col2:
-                chol = st.number_input("Chol (Kolesterol)", min_value=0.0, value=0.0, format="%.1f")
-                tg = st.number_input("TG (Trigliserida)", min_value=0.0, value=0.0, format="%.1f")
-                hdl = st.number_input("HDL", min_value=0.0, value=0.0, format="%.1f")
-                ldl = st.number_input("LDL", min_value=0.0, value=0.0, format="%.1f")
-                vldl = st.number_input("VLDL", min_value=0.0, value=0.0, format="%.1f")
+                chol = st.number_input("Chol (Kolesterol)", min_value=0.0, max_value=1000.0, value=0.0, format="%.1f")
+                tg = st.number_input("TG (Trigliserida)", min_value=0.0, max_value=1000.0, value=0.0, format="%.1f")
+                hdl = st.number_input("HDL", min_value=0.0, max_value=300.0, value=0.0, format="%.1f")
+                ldl = st.number_input("LDL", min_value=0.0, max_value=500.0, value=0.0, format="%.1f")
+                vldl = st.number_input("VLDL", min_value=0.0, max_value=500.0, value=0.0, format="%.1f")
 
             submit = st.form_submit_button("Cek Status Kesehatan", use_container_width=True)
 
@@ -386,7 +387,6 @@ if st.session_state['is_auth']:
                 labels = {0: "Normal", 1: "Pra-Diabetes", 2: "Diabetes"}
                 hasil_diag = labels[pred]
                 
-                # PERBAIKAN POIN 1: Menambahkan logika Saran Medis
                 if hasil_diag == "Normal":
                     saran = "Pertahankan gaya hidup sehat, rutin berolahraga, dan jaga pola makan Anda."
                 elif hasil_diag == "Pra-Diabetes":
@@ -431,7 +431,6 @@ if st.session_state['is_auth']:
             if pilih_id:
                 data_baris = df_riwayat[df_riwayat['id'] == pilih_id].iloc[0]
                 
-                # Mendefinisikan ulang saran untuk dimasukkan ke dalam PDF
                 if data_baris['hasil'] == "Normal":
                     saran_pdf = "Pertahankan gaya hidup sehat, rutin berolahraga, dan jaga pola makan Anda."
                 elif data_baris['hasil'] == "Pra-Diabetes":
