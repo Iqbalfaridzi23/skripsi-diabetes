@@ -3,7 +3,7 @@
 Aplikasi berbasis web ini dikembangkan sebagai bagian dari Skripsi Program Studi Teknik Informatika Universitas Tarumanagara. Sistem ini menggunakan algoritma **Gradient Boosting** yang dikombinasikan dengan teknik augmentasi **Bootstrap** dan penyeimbang kelas **SMOTE** untuk memprediksi status diabetes (Normal, Pra-Diabetes, Diabetes) berdasarkan 11 parameter uji laboratorium.
 
 ## 🛠️ Teknologi yang Digunakan
-* **Bahasa Pemrograman:** Python 3.9+
+* **Bahasa Pemrograman:** Python 3.10
 * **Machine Learning:** Scikit-Learn (Gradient Boosting, SMOTE)
 * **Web Framework:** Streamlit
 * **Basis Data:** SQLite
