@@ -63,12 +63,10 @@ conn, cursor = init_db()
 
 @st.cache_resource
 def load_assets():
-    try:
-        model = joblib.load('model_gradient_boosting.pkl')
-        scaler = joblib.load('scaler.pkl')
-        return model, scaler
-    except:
-        return None, None
+    # Biarkan error muncul untuk keperluan debugging
+    model = joblib.load('model_gradient_boosting.pkl')
+    scaler = joblib.load('scaler.pkl')
+    return model, scaler
 
 model, scaler = load_assets()
 
